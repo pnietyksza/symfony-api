@@ -57,6 +57,8 @@ class FetchdataCommand extends Command
                     $currency->setCode($value->code);
                     $currency->setValue($value->mid);
                     $this->entityManager->persist($currency);
+                }else{
+                    $existingCurrency->setValue($value->mid);
                 }
             }
             $this->entityManager->flush();
