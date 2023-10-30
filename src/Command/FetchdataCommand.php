@@ -33,7 +33,7 @@ class FetchdataCommand extends Command
 
         try {
             $data = $this->client->request(
-                'get',
+                'GET',
                 'http://api.nbp.pl/api/exchangerates/tables/a/?format=json'
             );
         } catch (ClientExceptionInterface $e) {
@@ -57,6 +57,8 @@ class FetchdataCommand extends Command
                     $currency->setCode($value->code);
                     $currency->setValue($value->mid);
                     $this->entityManager->persist($currency);
+                }else{
+                    $existingCurrency->setValue($value->mid);
                 }
             }
             $this->entityManager->flush();
