@@ -93,16 +93,26 @@ class ApiController extends AbstractController
         $code = $request->request->filter('code');
         $value = $request->request->filter('value');
 
+        // on this step we've got problem with types, when we send in request
+        // value "0" interpreter can see it like a empty string and empty($value) will return 0
         if (
             empty($name) ||
             empty($code) ||
             empty($value)
         ) {
-            return $this->json(['No one fields could be empty']);    
+            return $this->json(['No one fields could be empty']);
         }
 
+        if (!strlen($code) === 3) {
+            return $this->json(['Code shoud have 3 chars']);
+        }
 
-        //todo: create validations
+        if (
+            !floatval($value) ||
+            !is_float(floatval($value))
+        ) {
+            return $this->json(['Value should be integer or float']);
+        }
 
         return $this->json(['this is post request']);
     }
