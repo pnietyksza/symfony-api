@@ -27,7 +27,7 @@ class ApiController extends AbstractController
         ]);
     }
 
-    #[Route('/currencies', name: 'currencies', methods: ['get'])]
+    #[Route('/currencies', name: 'currencies', methods: ['GET'])]
     public function currencies(
         ManagerRegistry $doctrine,
     ): JsonResponse {
@@ -47,7 +47,7 @@ class ApiController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/currency/{code}', name: 'currency', methods: ['get'])]
+    #[Route('/currency/{code}', name: 'currency', methods: ['GET'])]
     public function currency(
         ManagerRegistry $doctrine,
         Request $request,
@@ -76,5 +76,60 @@ class ApiController extends AbstractController
         ];
 
         return $this->json($data);
+    }
+
+    #[Route('/currency', name: 'create currency', methods: ['POST', 'GET'])]
+    public function postCurrency(
+        ManagerRegistry $doctrine,
+        Request $request,
+    ): JsonResponse {
+
+        if (!$request->isMethod('POST'))
+            return $this->json(['Send POST request or read documentation on /']);
+
+        $name = $request->request->filter('name');
+        $code = $request->request->filter('code');
+        $value = $request->request->filter('value');
+
+        // on this step we've got problem with types, when we send in request
+        // value "0" interpreter can see it like a empty string and empty($value) will return 0
+        if (
+            empty($name) ||
+            empty($code) ||
+            empty($value)
+        ) {
+            return $this->json(['No one fields could be empty']);
+        }
+
+        if (!strlen($code) === 3) {
+            return $this->json(['Code shoud have 3 chars']);
+        }
+
+        if (
+            !floatval($value) ||
+            !is_float(floatval($value))
+        ) {
+            return $this->json(['Value should be integer or float']);
+        }
+        $entityManager = $doctrine->getManager('default');
+
+        $existingCurrency = $entityManager
+            ->getRepository(Currency::class)
+            ->findOneBy(['code' => (string)$code]);
+
+        if (!$existingCurrency) {
+            $currency = new Currency();
+            $currency->setName($name);
+            $currency->setCode($code);
+            $currency->setValue($value);
+            $entityManager->persist($currency);
+            $entityManager->flush();
+            return $this->json(['Currency added']);
+        } else {
+            $existingCurrency->setValue($value);
+            $existingCurrency->setName($name);
+            $entityManager->flush();
+            return $this->json(['Currency update complete']);
+        }
     }
 }
