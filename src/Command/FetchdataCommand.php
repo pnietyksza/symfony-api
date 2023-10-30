@@ -33,7 +33,7 @@ class FetchdataCommand extends Command
 
         try {
             $data = $this->client->request(
-                'get',
+                'GET',
                 'http://api.nbp.pl/api/exchangerates/tables/a/?format=json'
             );
         } catch (ClientExceptionInterface $e) {
