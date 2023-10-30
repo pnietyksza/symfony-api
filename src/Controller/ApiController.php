@@ -27,7 +27,7 @@ class ApiController extends AbstractController
         ]);
     }
 
-    #[Route('/currencies', name: 'currencies', methods: ['get'])]
+    #[Route('/currencies', name: 'currencies', methods: ['GET'])]
     public function currencies(
         ManagerRegistry $doctrine,
     ): JsonResponse {
@@ -47,12 +47,14 @@ class ApiController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/currency/{code}', name: 'currency', methods: ['get'])]
+    #[Route('/currency/{code}', name: 'currency', methods: ['GET'])]
     public function currency(
         ManagerRegistry $doctrine,
         Request $request,
         string $code,
     ): JsonResponse {
+        dump('get');
+        exit;
         if (strlen($code) !== 3)
             return $this->json([
                 "Please put right currency code"
@@ -76,5 +78,32 @@ class ApiController extends AbstractController
         ];
 
         return $this->json($data);
+    }
+
+    #[Route('/currency', name: 'create currency', methods: ['POST', 'GET'])]
+    public function postCurrency(
+        ManagerRegistry $doctrine,
+        Request $request,
+    ): JsonResponse {
+
+        if (!$request->isMethod('POST'))
+            return $this->json(['Send POST request or read documentation on /']);
+
+        $name = $request->request->filter('name');
+        $code = $request->request->filter('code');
+        $value = $request->request->filter('value');
+
+        if (
+            empty($name) ||
+            empty($code) ||
+            empty($value)
+        ) {
+            return $this->json(['No one fields could be empty']);    
+        }
+
+
+        //todo: create validations
+
+        return $this->json(['this is post request']);
     }
 }
