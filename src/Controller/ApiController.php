@@ -53,8 +53,6 @@ class ApiController extends AbstractController
         Request $request,
         string $code,
     ): JsonResponse {
-        dump('get');
-        exit;
         if (strlen($code) !== 3)
             return $this->json([
                 "Please put right currency code"
@@ -129,6 +127,7 @@ class ApiController extends AbstractController
             return $this->json(['Currency added']);
         } else {
             $existingCurrency->setValue($value);
+            $existingCurrency->setName($name);
             $entityManager->flush();
             return $this->json(['Currency update complete']);
         }
