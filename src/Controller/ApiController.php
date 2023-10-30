@@ -113,7 +113,24 @@ class ApiController extends AbstractController
         ) {
             return $this->json(['Value should be integer or float']);
         }
+        $entityManager = $doctrine->getManager('default');
 
-        return $this->json(['this is post request']);
+        $existingCurrency = $entityManager
+            ->getRepository(Currency::class)
+            ->findOneBy(['code' => (string)$code]);
+
+        if (!$existingCurrency) {
+            $currency = new Currency();
+            $currency->setName($name);
+            $currency->setCode($code);
+            $currency->setValue($value);
+            $entityManager->persist($currency);
+            $entityManager->flush();
+            return $this->json(['Currency added']);
+        } else {
+            $existingCurrency->setValue($value);
+            $entityManager->flush();
+            return $this->json(['Currency update complete']);
+        }
     }
 }
