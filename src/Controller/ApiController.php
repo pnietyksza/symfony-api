@@ -11,12 +11,19 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ApiController extends AbstractController
 {
-    #[Route('/api', name: 'app_api')]
+    #[Route('/', name: 'app_api')]
     public function index(): JsonResponse
     {
         return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/ApiController.php',
+            'message' => 'Hello! Welcome to restAPI with currencies',
+            'routes:' =>
+            [
+                '(GET)/currencies - is the endpoint with whole informations about all currencies',
+                '(GET)/currency/code - is with informations about one currency *(code(3 string)',
+                '(POST)/currency - you can create your own currency *(name(255 string),code(3 string),value(float))',
+                '(PUT)/currency - for actualization one currency *(name(255 string),code(3 string),value(float))',
+                '(DELETE)/currency - for delete currency *(code(3 string))'
+            ]
         ]);
     }
 
